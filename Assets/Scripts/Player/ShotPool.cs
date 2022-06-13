@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ShotPool : MonoBehaviour
@@ -20,22 +18,8 @@ public class ShotPool : MonoBehaviour
     private void Start()
     {
         _pool = new PoolMono<Shot>(_shotPrefab, _poolCount, transform);
-        _pool.AutoExpand = _autoExpand;       
+        _pool.AutoExpand = _autoExpand;
     }
 
-    private void OnEnable()
-    {
-        _player.OnShootEvent += OnShoot;
-    }
 
-    private void OnDisable()
-    {
-        _player.OnShootEvent -= OnShoot;
-    }
-
-    private void OnShoot()
-    {
-        var shot = _pool.GetFreeElement();
-        shot.transform.position = _player.transform.position;
-    }
 }
