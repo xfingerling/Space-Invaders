@@ -6,16 +6,24 @@ public class Invaders : MonoBehaviour
     [SerializeField] private int _rows = 5;
     [SerializeField] private int _columns = 11;
     [SerializeField] AnimationCurve _speed;
+    [SerializeField] float _missileAttackRate = 1f;
+    [SerializeField] Projectitle _missilePrefab;
 
     private Vector3 _direction = Vector2.right;
 
-    public int AmountKilled { get; private set; }
-    public int TotalInvaders => _rows * _columns;
-    public float PercentKilled => (float)AmountKilled / (float)TotalInvaders;
+    public int amountKilled { get; private set; }
+    public int amountAlive => totalInvaders - amountKilled;
+    public int totalInvaders => _rows * _columns;
+    public float percentKilled => (float)amountKilled / (float)totalInvaders;
 
     private void Awake()
     {
         SpawnInvaders();
+    }
+
+    private void Start()
+    {
+        InvokeRepeating(nameof(MissileAttack), _missileAttackRate, _missileAttackRate);
     }
 
     private void Update()
@@ -25,7 +33,7 @@ public class Invaders : MonoBehaviour
 
     private void Move()
     {
-        transform.position += _direction * _speed.Evaluate(PercentKilled) * Time.deltaTime;
+        transform.position += _direction * _speed.Evaluate(percentKilled) * Time.deltaTime;
 
         Vector3 leftEdge = Camera.main.ViewportToWorldPoint(Vector3.zero);
         Vector3 rightEdge = Camera.main.ViewportToWorldPoint(Vector3.right);
@@ -66,9 +74,24 @@ public class Invaders : MonoBehaviour
         }
     }
 
+    private void MissileAttack()
+    {
+        foreach (Transform invader in transform)
+        {
+            if (!invader.gameObject.activeInHierarchy)
+                continue;
+
+            if (Random.value < (1f / (float)amountAlive))
+            {
+                Instantiate(_missilePrefab, invader.position, Quaternion.identity);
+                break;
+            }
+        }
+    }
+
     private void OnKilled()
     {
-        AmountKilled++;
+        amountKilled++;
     }
 
     private void AdvanceRow()
