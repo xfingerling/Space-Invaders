@@ -2,7 +2,10 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] private Projectitle _laserPrefab;
     [SerializeField] private float _speed = 5;
+
+    private bool _laserActive;
 
     private void Update()
     {
@@ -23,6 +26,17 @@ public class Player : MonoBehaviour
 
     private void Shoot()
     {
+        if (!_laserActive)
+        {
+            Projectitle projectitle = Instantiate(_laserPrefab, transform.position, Quaternion.identity);
+            projectitle.OnDestroyEvent += OnDestroyed;
+            _laserActive = true;
+        }
 
+    }
+
+    private void OnDestroyed()
+    {
+        _laserActive = false;
     }
 }

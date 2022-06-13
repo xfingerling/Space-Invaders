@@ -1,18 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class Projectitle : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private Vector3 _direction;
+    [SerializeField] private float _speed;
+
+    public event Action OnDestroyEvent;
+
+    private void Update()
     {
-        
+        transform.position += _direction * _speed * Time.deltaTime;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        
+        OnDestroyEvent?.Invoke();
+        Destroy(gameObject);
     }
 }
