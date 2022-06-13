@@ -5,9 +5,13 @@ public class Invaders : MonoBehaviour
     [SerializeField] private Invader[] _prefabs;
     [SerializeField] private int _rows = 5;
     [SerializeField] private int _columns = 11;
-    [SerializeField] private float _speed = 1f;
+    [SerializeField] AnimationCurve _speed;
 
     private Vector3 _direction = Vector2.right;
+
+    public int AmountKilled { get; private set; }
+    public int TotalInvaders => _rows * _columns;
+    public float PercentKilled => (float)AmountKilled / (float)TotalInvaders;
 
     private void Awake()
     {
@@ -21,7 +25,7 @@ public class Invaders : MonoBehaviour
 
     private void Move()
     {
-        transform.position += _direction * _speed * Time.deltaTime;
+        transform.position += _direction * _speed.Evaluate(PercentKilled) * Time.deltaTime;
 
         Vector3 leftEdge = Camera.main.ViewportToWorldPoint(Vector3.zero);
         Vector3 rightEdge = Camera.main.ViewportToWorldPoint(Vector3.right);
@@ -52,11 +56,19 @@ public class Invaders : MonoBehaviour
             for (int column = 0; column < _columns; column++)
             {
                 Invader invader = Instantiate(_prefabs[row], transform);
+
+                invader.OnKilledEvent += OnKilled;
+
                 Vector3 position = rowPosition;
                 position.x += column * 2f;
                 invader.transform.localPosition = position;
             }
         }
+    }
+
+    private void OnKilled()
+    {
+        AmountKilled++;
     }
 
     private void AdvanceRow()
@@ -67,4 +79,6 @@ public class Invaders : MonoBehaviour
         position.y -= 1;
         transform.position = position;
     }
+
+
 }
